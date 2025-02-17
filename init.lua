@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -331,7 +331,6 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]oggle' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
       },
     },
   },
@@ -662,8 +661,6 @@ require('lazy').setup({
         cssls = {}, -- For CSS and Tailwind CSS
 
         emmet_ls = {}, -- For Emmet support
-
-        tsserver = {}, -- For TypeScript and JSX/TSX
       }
 
       -- Ensure the servers and tools above are installed
@@ -710,37 +707,6 @@ require('lazy').setup({
       }
 
       require('lspconfig').emmet_ls.setup {}
-
-      require('lspconfig').tsserver.setup {
-        on_attach = function(client, bufnr)
-          -- Optional: Add keybindings or other configurations specific to TypeScript
-          local function buf_set_option(...)
-            vim.api.nvim_buf_set_option(bufnr, ...)
-          end
-          buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
-          -- Mappings.
-          local opts = { noremap = true, silent = true }
-          buf_set_option('mapleader', '\\')
-          vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-          vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
-          vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-          vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-          vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-          vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
-          vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts)
-          vim.keymap.set('n', '<leader>wl', function()
-            print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-          end, opts)
-          vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
-          vim.keymap.set('n', '<leader>ds', vim.lsp.buf.document_symbol, opts)
-          vim.keymap.set('n', '<leader>dl', vim.lsp.buf.list_diagnostics, opts)
-          vim.keymap.set('n', 'gD', vim.lsp.buf.definition, opts)
-          vim.keymap.set('n', '<leader>dd', vim.lsp.buf.declaration, opts)
-          vim.keymap.set('n', '<leader>di', vim.lsp.buf.incoming_calls, opts)
-          vim.keymap.set('n', '<leader>do', vim.lsp.buf.outgoing_calls, opts)
-          vim.keymap.set('n', '<leader>ls', vim.lsp.buf.toggle_lsp_log, opts)
-        end,
-      }
     end,
   },
 
@@ -807,12 +773,13 @@ require('lazy').setup({
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+              require('luasnip').filetype_extend('typescript', { 'javascript' })
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
@@ -843,9 +810,9 @@ require('lazy').setup({
         -- No, but seriously. Please read `:help ins-completion`, it is really good!
         mapping = cmp.mapping.preset.insert {
           -- Select the [n]ext item
-          ['<C-n>'] = cmp.mapping.select_next_item(),
+          -- ['<C-n>'] = cmp.mapping.select_next_item(),
           -- Select the [p]revious item
-          ['<C-p>'] = cmp.mapping.select_prev_item(),
+          -- ['<C-p>'] = cmp.mapping.select_prev_item(),
 
           -- Scroll the documentation window [b]ack / [f]orward
           ['<C-b>'] = cmp.mapping.scroll_docs(-4),
@@ -854,11 +821,11 @@ require('lazy').setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
+          -- ['<C-y>'] = cmp.mapping.confirm { select = true },
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
-          --['<CR>'] = cmp.mapping.confirm { select = true },
+          ['<CR>'] = cmp.mapping.confirm { select = true },
           ['<Tab>'] = cmp.mapping.select_next_item(),
           ['<S-Tab>'] = cmp.mapping.select_prev_item(),
 
@@ -908,13 +875,14 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
+    'rose-pine/neovim',
+    name = 'rose-pine',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'rose-pine'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
@@ -987,12 +955,6 @@ require('lazy').setup({
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
 
-  {
-    'pmizio/typescript-tools.nvim',
-    dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
-    opts = {},
-  },
-
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -1005,7 +967,7 @@ require('lazy').setup({
   -- require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
@@ -1013,7 +975,7 @@ require('lazy').setup({
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
   --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
