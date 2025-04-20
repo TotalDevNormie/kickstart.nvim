@@ -8,11 +8,9 @@ return {
     -- for example
     provider = 'gemini',
     gemini = {
-      api_key_name = 'GEMINI_API_KEY', -- the shell command must prefixed with `^cmd:(.*)`
-      model = 'gemini-2.0-flash-lite-preview-02-05',
-      timeout = 30000, -- timeout in milliseconds
+      api_key_name = 'GEMINI_API_KEY',
+      model = 'gemini-2.0-pro-exp-02-05',
       temperature = 0, -- adjust if needed
-      max_tokens = 4096,
     },
     vendors = {
       groq = {
